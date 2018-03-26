@@ -1,0 +1,9 @@
+[
+    {"projectId": "d1fwewrxwgede", "designCenter":"Winston", "creationDate":"2004-01-20T20:30:40", "completionDate":"2019-01-08T16:10:01"},
+    {"projectId": "d2fwewrxwgede", "designCenter":"Westmont", "creationDate":"2013-01-20T10:30:40", "completionDate":"2016-02-28T16:10:01"},
+    {"projectId": "d3fwewrxwgede", "designCenter":"Erlanger", "creationDate":"2002-01-20T23:30:40", "completionDate":"2018-05-18T16:10:01"},
+    {"projectId": "d4fwewrxwgede", "designCenter":"Glenrock", "creationDate":"2008-01-20T10:30:40", "completionDate":"2018-03-18T16:10:01"},
+    {"projectId": "d5fwewrxwgede", "designCenter":"York", "creationDate":"2017-01-20T15:10:40", "completionDate":"2018-08-18T16:10:01"},    
+    {"projectId": "", "designCenter":"Winston", "creationDate":"2017-01-20T20:30:40", "completionDate":"2017-09-14T16:10:01"},
+    {"projectId": "d6fwewrxwgede", "designCenter":"New Jersey", "creationDate":"2016-01-23T14:10:40", "completionDate":"2018-08-18T19:10:01"}
+]
