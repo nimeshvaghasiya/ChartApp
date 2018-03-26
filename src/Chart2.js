@@ -20,9 +20,6 @@ import Tooltip from 'material-ui/Tooltip';
 import DeleteIcon from 'material-ui-icons/Delete';
 import FilterListIcon from 'material-ui-icons/FilterList';
 import { lighten } from 'material-ui/styles/colorManipulator';
-import * as d3 from "d3";
-import svgdata from './data.json';
-import './Chart.css';
 
 let counter = 0;
 function createData(designCenter) {
@@ -33,12 +30,12 @@ function createData(designCenter) {
 const columnData = [
   // { id:'workflowid', numeric:false, disablePadding:true, label:"id"},
   { id: 'projectId', numeric: false, disablePadding: true, label: 'Project Number' },
-  { id: 'designCenter', numeric: false, disablePadding: true, label: 'Design Center' },
+  { id: 'requestName', numeric: false, disablePadding: true, label: 'Request Name' },
   { id: 'hours', numeric: false, disablePadding: true, label: 'Hours' }
 
 ];
 
-class EnhancedTableHead extends React.Component {
+class EnhancedTableHead2 extends React.Component {
 
   createSortHandler = property => event => {
     this.props.onRequestSort(event, property);
@@ -57,7 +54,7 @@ class EnhancedTableHead extends React.Component {
               onChange={onSelectAllClick}
             />
           </TableCell>
-          {columnData.map(column => {
+          {columnData.map(column => {            
             return (
               <TableCell
                 key={column.id}
@@ -87,7 +84,7 @@ class EnhancedTableHead extends React.Component {
   }
 }
 
-EnhancedTableHead.propTypes = {
+EnhancedTableHead2.propTypes = {
   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
   onSelectAllClick: PropTypes.func.isRequired,
@@ -103,13 +100,13 @@ const toolbarStyles = theme => ({
   highlight:
     theme.palette.type === 'light'
       ? {
-        color: theme.palette.secondary.main,
-        backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-      }
+          color: theme.palette.secondary.main,
+          backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+        }
       : {
-        color: theme.palette.text.primary,
-        backgroundColor: theme.palette.secondary.dark,
-      },
+          color: theme.palette.text.primary,
+          backgroundColor: theme.palette.secondary.dark,
+        },
   spacer: {
     flex: '1 1 100%',
   },
@@ -136,8 +133,8 @@ let EnhancedTableToolbar = props => {
             {numSelected} selected
           </Typography>
         ) : (
-            <Typography variant="title">Design Center Hours</Typography>
-          )}
+          <Typography variant="title">Winston Design Center Hours</Typography>
+        )}
       </div>
       <div className={classes.spacer} />
       <div className={classes.actions}>
@@ -148,12 +145,12 @@ let EnhancedTableToolbar = props => {
             </IconButton>
           </Tooltip>
         ) : (
-            <Tooltip title="Filter list">
-              <IconButton aria-label="Filter list">
-                <FilterListIcon />
-              </IconButton>
-            </Tooltip>
-          )}
+          <Tooltip title="Filter list">
+            <IconButton aria-label="Filter list">
+              <FilterListIcon />
+            </IconButton>
+          </Tooltip>
+        )}
       </div>
     </Toolbar>
   );
@@ -188,117 +185,32 @@ class EnhancedTable extends React.Component {
       selected: [],
       data: [],
       page: 0,
-      rowsPerPage: 5
-    };
+      rowsPerPage: 5       
+      };
   }
 
-  componentDidMount() {
-    // // Api code
-    // fetch(`http://localhost:3000/api/WfRequestIndices/?filter={%22limit%22:100}`)
-    //   .then(response => response.json())
-    //   .then(data => {
-    //     data = data.filter(function (d) {
-    //       return d.designCenter.toString().trim() !== '';
-    //     });
-    //     data = data.filter(function (d) {
-    //       return d.projectId.toString().trim() !== '';
-    //     });
-    //     for (var i = 0; i < data.length; i++) {
-    //       data[i]['id'] = i + 1;
-    //       var date1 = new Date(data[i].completionDate);
-    //       var date2 = new Date(data[i].creationDate);
-    //       var hours = Math.abs(date1 - date2) / 36e5;
-    //       data[i]['hours'] = hours;
-    //     }
-    //     this.setState({ data: data });
-    //     this.setGraph(data);
-    //   });
-    // // End Api Code
-    // Local json File
-    var xdata = [];
-    xdata = svgdata.filter(function (d) {
-      return d.designCenter.toString().trim() !== '';
-    });
-    xdata = xdata.filter(function (d) {
-      return d.projectId.toString().trim() !== '';
-    });
-    for (var i = 0; i < xdata.length; i++) {
-      xdata[i]['id'] = i + 1;
-      var date1 = new Date(xdata[i].completionDate);
-      var date2 = new Date(xdata[i].creationDate);
-      var hours = Math.round(Math.abs(date1 - date2) / 36e5);
-      xdata[i]['hours'] = hours;
+    componentDidMount() {
+      var responseCopy;
+        fetch(`http://localhost:3000/api/WfRequestIndices/?filter={%22limit%22:100,%20%22where%22:{%22designCenter%22:%22winston%22}}`) 
+        .then(response => response.json())
+        .then(data => {  
+          data = data.filter(function(d){
+            return d.designCenter.toString().trim() !== '';
+           });      
+           data = data.filter(function(d){
+            return d.projectId.toString().trim() !== '';
+           }); 
+          for(var i=0; i<data.length;i++){
+            data[i]['id'] =i+1;
+            var date1 = new Date(data[i].completionDate);
+            var date2 = new Date(data[i].creationDate);
+            var hours = Math.abs(date1 - date2) / 36e5;
+            data[i]['hours'] = hours;
+          }
+          this.setState({ data: data });          
+        });
     }
-    this.setState({ data: xdata });
-    this.setGraph(xdata);
-    // End Local json file
-  }
-
-  setGraph(sdata) {
-    console.log(sdata);
-    var svg = d3.select("#svgChart"),
-      margin = { top: 20, right: 20, bottom: 30, left: 80 },
-      width = +svg.attr("width") - margin.left - margin.right,
-      height = +svg.attr("height") - margin.top - margin.bottom;
-
-    var tooltip = d3.select("body").append("div").attr("class", "toolTip");
-
-    var x = d3.scaleLinear().range([0, width]);
-    var y = d3.scaleBand().range([height, 0]);
-
-    var g = svg.append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    // g.append("text")
-    //   .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-    //   .attr("transform", "translate(" + -60 + "," + (height / 2) + ")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-    //   .text("City");
-
-
-    g.append("text")
-      .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-      .attr("transform", "translate(" + (height / 2) + "," + -70 + ")")  // text is drawn off the screen top left, move down and out and rotate
-      .text("City city city ");
-    // d3.json("data.json", function (error, sdata) {
-    //   if (error) throw error;
-
-    //sdata.sort(function(a, b) { return a.hours - b.hours; });
-
-    x.domain([0, d3.max(sdata, function (d) { return d.hours; })]);
-    y.domain(sdata.map(function (d) { return d.designCenter; })).padding(0.1);
-
-    g.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x).ticks(5).tickFormat(function (d) { return parseInt(d / 1000); }).tickSizeInner([-height]));
-
-    g.append("g")
-      .attr("class", "y axis")
-      .call(d3.axisLeft(y));
-
-    g.selectAll(".bar")
-      .data(sdata)
-      .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", 0)
-      .attr("height", y.bandwidth())
-      .attr("y", function (d) {
-        return y(d.designCenter);
-      })
-      .attr("width", function (d) {
-        return x(d.hours);
-      })
-      .on("mousemove", function (d) {
-        tooltip
-          .style("left", d3.event.pageX - 50 + "px")
-          .style("top", d3.event.pageY - 70 + "px")
-          .style("display", "inline-block")
-          .html((d.designCenter) + "<br>" + (d.hours));
-      })
-      .on("mouseout", function (d) { tooltip.style("display", "none"); });
-    // });
-  }
-
+ 
 
   handleRequestSort = (event, property) => {
     const orderBy = property;
@@ -362,13 +274,10 @@ class EnhancedTable extends React.Component {
 
     return (
       <Paper className={classes.root}>
-        <div>
-          <svg id="svgChart" width="960" height="500"></svg>
-        </div>
         <EnhancedTableToolbar numSelected={selected.length} />
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
-            <EnhancedTableHead
+            <EnhancedTableHead2
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
@@ -392,23 +301,23 @@ class EnhancedTable extends React.Component {
                     <TableCell padding="checkbox">
                       <Checkbox checked={isSelected} />
                     </TableCell>
-                    <TableCell padding="none">{n.projectId}</TableCell>
-                    <TableCell padding="none">{n.designCenter}</TableCell>
-                    <TableCell padding="none">{n.hours}</TableCell>
+                    <TableCell  padding="none">{n.projectId}</TableCell>
+                    <TableCell padding="none">{n.requestName}</TableCell>
+                    <TableCell  padding="none">{n.hours}</TableCell>
 
                   </TableRow>
                 );
               })}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 49 * emptyRows }}>
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={4} />
                 </TableRow>
               )}
             </TableBody>
             <TableFooter>
               <TableRow>
                 <TablePagination
-                  colSpan={6}
+                  colSpan={4}
                   count={data.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
@@ -424,15 +333,15 @@ class EnhancedTable extends React.Component {
               </TableRow>
             </TableFooter>
           </Table>
-        </div>
-
+        </div> 
+        
 
       </Paper>
 
-
+      
     );
 
-
+    
   }
 }
 
